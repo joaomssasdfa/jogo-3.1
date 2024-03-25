@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adivinhe o Número</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  #resultParas {
+    margin-top: 20px;
+  }
+
+  #hangman {
+    font-family: monospace;
+    font-size: 1.5em;
+    line-height: 1.1em;
+    white-space: pre;
+  }
+
+  #timer {
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .red {
+    background-color: red;
+    color: white;
+  }
+
+  .green {
+    background-color: green;
+    color: white;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Adivinhe o Número</h1>
+  <p>Você tem 10 tentativas para adivinhar um número entre 0 e 200.</p>
+  <p>Cronômetro: <span id="timer">60</span> segundos</p>
+  <input type="number" id="guessField" class="guessField">
+  <button onclick="checkGuess()">Adivinhar</button>
+  <div id="resultParas">
+    <p id="guesses"></p>
+    <p id="lastResult"></p>
+    <p id="lowOrHi"></p>
+  </div>
+  <pre id="hangman"></pre>
+</div>
+
+<script>
+  let randomNumber = Math.floor(Math.random() * 201);
+  let guesses = document.querySelector('#guesses');
+  let lastResult = document.querySelector('#lastResult');
+  let lowOrHi = document.querySelector('#lowOrHi');
+  let guessSubmit = document.querySelector('.guessSubmit');
+  let guessField = document.querySelector('#guessField');
+  let guessCount = 1;
+  let timer;
+  let timeLeft = 60;
+
+  function initializeGame() {
+    guesses.textContent = '';
+    lastResult.textContent = '';
+    lowOrHi.textContent = '';
+    guessCount = 1;
+    timeLeft = 60;
+    document.getElementById('timer').textContent = timeLeft;
+    clearInterval(timer);
+    timer = setInterval(updateTimer, 1000);
+    drawHangman(0);
+  }
+
+  function updateTimer() {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft;
+    if (timeLeft === 0) {
+      clearInterval(timer);
+      endGame("Fim de tempo!", true);
+    }
+  }
+
+  function checkGuess() {
+    let userGuess = Number(guessField.value);
+    guesses.textContent += userGuess + ' ';
+
+    if (userGuess === randomNumber) {
+      endGame("Parabéns! Você acertou!", true);
+    } else {
+      if (guessCount === 10) {
+        endGame("!!!Fim de jogo!!!", true);
+      } else {
+        if (userGuess < randomNumber) {
+          lowOrHi.textContent = 'O número é maior!';
+        } else if (userGuess > randomNumber) {
+          lowOrHi.textContent = 'O número é menor!';
+        }
+        guessCount++;
+        drawHangman(guessCount - 1);
+        lastResult.textContent = 'Errado!';
+        lastResult.classList.add('red');
+        setTimeout(() => {
+          lastResult.textContent = '';
+          lastResult.classList.remove('red');
+        }, 2000);
+      }
+    }
+    guessField.value = '';
+    guessField.focus();
+  }
+
+  function endGame(message, timeout) {
+    clearInterval(timer);
+    lastResult.textContent = message;
+    lastResult.classList.add(timeout ? 'red' : 'green');
+    guessField.disabled = true;
+    guessSubmit.disabled = true;
+  }
+
+  function drawHangman(misses) {
+    let hangman = document.getElementById('hangman');
+    switch (misses) {
+      case 1:
+        hangman.textContent = 
+        `     ____
+        |    |
+        |    O
+        |    
+        |    
+        |____`;
+        break;
+      case 2:
+        hangman.textContent = 
+        `     ____
+        |    |
+        |    O
+        |    |
+        |    
+        |____`;
+        break;
+      case 3:
+        hangman.textContent = 
+        `     ____
+        |    |
+        |    O
+        |   /|
+        |    
+        |____`;
+        break;
+      case 4:
+        hangman.textContent = 
+        `     ____
+        |    |
+        |    O
+        |   /|\\
+        |    
+        |____`;
+        break;
+      case 5:
+        hang
+        `     ____
+        |    |
+        |    O
+        |   /|\\
+        |   / 
+        |____`;
+        break;
+      case 6:
+        hangman.textContent = 
+        `     ____
+        |    |
+        |    O
+        |   /|\\
+        |   / \\
+        |____`;
+        break;
+      default:
+        hangman.textContent = 
+        `     ____
+        |    |
+        |    
+        |    
+        |    
+        |____`;
+    }
+  }
+
+  initializeGame();
+</script>
+</body>
+</html>
